@@ -1,52 +1,54 @@
-$('#button').on('click', function(e){
-	e.preventDefault()
-	var beer = $('#text').val()
+$('#button').on('click', function(e) {
+    e.preventDefault()
+    var beer = $('#beer').val()
 
-	console.log(beer);
+    console.log(beer);
 
-	$.ajax({
-		  type: 'GET',
-      	  dataType: "json",
-          url: 'https://quiet-inlet-67115.herokuapp.com/api/search/all?q='+beer
+    $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: 'https://quiet-inlet-67115.herokuapp.com/api/search/all?q=' + beer
         })
-		.then(function(data){
-			console.log(data);
+        .then(function(data) {
+            console.log(data);
 
-			var beer1 = data[0];
-			var beer2 = data[1];
-			var beer3 = data[2];
+            var htmlArray = data.map(function (beer) {
+		  		return '<option value="' + beer.id + '">' + beer.name + '</option>'
+		  	})
 
-			var image1 = beer1.labels.medium;
-			var description1 = beer1.description;
-			var name1 = beer1.name;
+		  	console.log(htmlList)
 
-			var image2 = beer2.labels.medium;
-			var description2 = beer2.description;
-			var name2 = beer2.name;
+		  	$('#list-beers').removeClass('hidden')
+		  	var htmlList = htmlArray.join('')
+		  	$('#list-beers').html(htmlList)
 
-			var image3 = beer3.labels.medium;
-			var description3 = beer3.description;
-			var name3 = beer3.name;
+        });
 
-
-			$("#image1").attr("src",image1);
-			$("#description1").text(description1);
-			$("#title1").text(name1);
-
-			$("#image2").attr("src",image2);
-			$("#description2").text(description2);
-			$("#title2").text(name2);
-
-			$("#image3").attr("src",image3);
-			$("#description3").text(description3);
-			$("#title3").text(name3);
-
-
-			//-----list li-------
-			// var htmlList = data.map( function(beerNames) {
-   //          return '<li>'+beerNames.name +'</li>'
-   //        }).join('')
-
-   //        $('ul').html( htmlList )
-		});
 })
+
+$('#list-beers').on('change', function (e) {
+		$('#beer-container').replaceWith('<div class="row" id="beer-container"></div>')
+  		var idBeer = $(this).val()
+
+  		$.ajax({
+  			url: 'https://quiet-inlet-67115.herokuapp.com/api/beer/' + idBeer
+  		})
+  		.then(function (data) {
+
+  			var beerImage
+  			var beerName
+  			var beerDescription
+
+  			data.labels ? beerImage =	data.labels.large : beerImage = 'http://www.aceitedearganweb.com/wp-content/uploads/2015/10/cerveza.jpg'
+  			data.name ? beerName =	data.name : beerName = idBeer
+  			data.description ? beerDescription =	data.description : beerDescription = '<p>No description found </p>'
+
+  			thumbnailHtml = '<div class="col-sm-6 col-md-4 col-md-offset-4"><div class="thumbnail"><img class="img-responsive" src="'+beerImage+'"><div class="caption"><h3>'+beerName+'</h3><p>'+beerDescription+'</p></div> </div></div>';
+
+  			$('#beer-container').append(thumbnailHtml)
+  		})
+
+});
+
+
+ 
